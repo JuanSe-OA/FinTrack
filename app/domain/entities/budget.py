@@ -1,4 +1,5 @@
 from dataclasses import dataclass
+from decimal import Decimal
 from sqlalchemy import UUID
 
 
@@ -9,8 +10,8 @@ class Budget:
     category_id: UUID
     month: int
     year: int
-    limit_amount: float
+    limit_amount: Decimal
 
-    def validate(self):
+    def __post_init__(self):
         if self.limit_amount <= 0:
             raise ValueError("Budget must be positive")

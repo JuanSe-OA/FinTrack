@@ -1,4 +1,5 @@
 from datetime import datetime
+from decimal import Decimal
 from sqlalchemy import (
     String, Boolean, DateTime, ForeignKey, Numeric, Text, CheckConstraint, Index
 )
@@ -24,7 +25,7 @@ class TransactionModel(Base):
         nullable=False
     )
 
-    amount: Mapped[float] = mapped_column(Numeric(12, 2), nullable=False)
+    amount: Mapped[Decimal] = mapped_column(Numeric(12, 2), nullable=False)
     description: Mapped[str | None] = mapped_column(Text)
     created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
 

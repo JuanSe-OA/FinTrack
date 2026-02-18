@@ -10,6 +10,7 @@ class SqlAlchemyUserRepository(UserRepository):
     def __init__(self, session: Session):
         self.session = session
 
+
     def get_by_id(self, user_id: UUID) -> User | None:
         model = self.session.get(UserModel, user_id)
         if not model:
@@ -20,7 +21,21 @@ class SqlAlchemyUserRepository(UserRepository):
             email=model.email,
             hashed_password=model.hashed_password,
             is_active=model.is_active,
-            created_at=model.created_at
+            created_at=model.created_at,
+        )
+
+
+    def get_by_email(self, email) -> User | None:
+        model = self.session.query(UserModel).filter(UserModel.email == email).first()
+        if not model:
+            return None
+
+        return User(
+            id=model.id,
+            email=model.email,
+            hashed_password=model.hashed_password,
+            is_active=model.is_active,
+            created_at=model.created_at,
         )
 
     def add(self, user: User) -> None:
@@ -29,6 +44,6 @@ class SqlAlchemyUserRepository(UserRepository):
             email=user.email,
             hashed_password=user.hashed_password,
             is_active=user.is_active,
-            created_at=user.created_at
+            created_at=user.created_at,
         )
         self.session.add(model)

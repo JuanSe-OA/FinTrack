@@ -1,4 +1,5 @@
 from datetime import datetime
+from decimal import Decimal
 from sqlalchemy import (
     String, Boolean, DateTime, ForeignKey,
     Numeric, Text, Integer, CheckConstraint,
@@ -29,7 +30,7 @@ class BudgetModel(Base):
 
     month: Mapped[int] = mapped_column(Integer, nullable=False)
     year: Mapped[int] = mapped_column(Integer, nullable=False)
-    limit_amount: Mapped[float] = mapped_column(Numeric(12, 2), nullable=False)
+    limit_amount: Mapped[Decimal] = mapped_column(Numeric(12, 2), nullable=False)
 
     __table_args__ = (
         CheckConstraint("limit_amount > 0", name="chk_budget_positive"),
