@@ -1,8 +1,8 @@
 from abc import ABC, abstractmethod
 from uuid import UUID
 
-from sqlalchemy import Transaction
-
+from app.domain.entities.transaction import Transaction
+from app.domain.entities.user import User
 
 class TransactionRepository (ABC):
 
@@ -15,7 +15,7 @@ class TransactionRepository (ABC):
         pass
 
     @abstractmethod
-    def list_by_user_id(self, user_id) -> list[Transaction]:
+    def list_by_user_id(self, user_id) -> list[User]:
         pass
 
     @abstractmethod
