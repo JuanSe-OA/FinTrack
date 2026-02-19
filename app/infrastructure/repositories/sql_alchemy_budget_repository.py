@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from app.domain.entities.budget import Budget
 from sqlalchemy.orm import Session
 from app.domain.repositories.budget_repository import BudgetRepository
@@ -14,20 +16,21 @@ class SqlAlchemyBudgetRepository(BudgetRepository):
             id=budget.id,
             user_id=budget.user_id,
             category_id=budget.category_id,
-            amount=budget.amount,
-            year=budget.year,
             month=budget.month,
+            year=budget.year,
+            limit_amount=budget.limit_amount,
+            
         )
         self.session.add(model)
 
 
         
-    def get_by_user_category_month(self, user_id, category_id, year, month) -> Budget | None:
+    def get_by_user_category_month(self, user_id, category_id, month, year) -> Budget | None:
         model = self.session.query(BudgetModel).filter_by(
             user_id=user_id,
             category_id=category_id,
-            year=year,
-            month=month
+            month=month,
+            year= year
         ).first()
         if not model:
             return None
@@ -35,8 +38,9 @@ class SqlAlchemyBudgetRepository(BudgetRepository):
             id=model.id,
             user_id=model.user_id,
             category_id=model.category_id,
-            amount=model.amount,
-            year=model.year,
             month=model.month,
+            year=model.year,
+            limit_amount=model.limit_amount
+            
         )
     
