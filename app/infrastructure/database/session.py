@@ -1,7 +1,7 @@
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
+from app.infrastructure.config import DATABASE_URL
 
-DATABASE_URL = "postgresql+psycopg2://postgres:postgres@localhost:5432/fintrack"
 
 engine = create_engine(
     DATABASE_URL,
