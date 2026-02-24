@@ -10,7 +10,7 @@ class GetBudgetStatusCommand:
     month: int
     year: int
 
-class GetBudgetStatusCase:
+class GetBudgetStatusUseCase:
     def __init__(self, uow: UnitOfWork):
         self.uow = uow
 
