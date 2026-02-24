@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timezone
 from sqlalchemy import (
     Boolean, DateTime, ForeignKey,
     Text,
@@ -26,6 +26,6 @@ class AlertModel(Base):
 
     message: Mapped[str] = mapped_column(Text, nullable=False)
     read: Mapped[bool] = mapped_column(Boolean, default=False)
-    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.now(timezone.utc))
 
     user = relationship("UserModel", back_populates="alerts")

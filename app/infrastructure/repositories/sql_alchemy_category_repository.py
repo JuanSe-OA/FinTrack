@@ -45,6 +45,17 @@ class SqlAlchemyCategoryRepository(CategoryRepository):
             )
             for model in models
         ]
+    def get_all_by_user_id_and_type(self, user_id, type) -> list[Category]:
+        models = (self.session.query(CategoryModel).filter(CategoryModel.user_id == user_id and CategoryModel.type == type).all())
+        return [
+            Category(
+                id=model.id,
+                name=model.name,
+                user_id=model.user_id,
+                type=model.type,
+            )
+            for model in models
+        ]
     
 
     def add(self, category: Category) -> Category | None:

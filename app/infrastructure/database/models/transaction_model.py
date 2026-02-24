@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timezone
 from decimal import Decimal
 from sqlalchemy import (
     String, Boolean, DateTime, ForeignKey, Numeric, Text, CheckConstraint, Index
@@ -27,7 +27,7 @@ class TransactionModel(Base):
 
     amount: Mapped[Decimal] = mapped_column(Numeric(12, 2), nullable=False)
     description: Mapped[str | None] = mapped_column(Text)
-    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.now(timezone.utc))
 
     __table_args__ = (
         CheckConstraint("amount > 0", name="chk_amount_positive"),

@@ -1,13 +1,16 @@
-from fastapi import FastAPI
-from contextlib import asynccontextmanager
+from app.infrastructure.config import (
+    SMTP_HOST, SMTP_PORT, SMTP_USERNAME, SMTP_PASSWORD, SMTP_SENDER, SECRET_KEY
+)
+from app.infrastructure.notifications.smtp_notification_service import SmtpNotificationService
+from app.infrastructure.security.jwt_token_service import JWTTokenService
+from app.infrastructure.security.bcrypt_password_hasher import BcryptPasswordHasher
 
-from app.infraestructure.database.base import Base
-from app.infraestructure.database.session import engine
-import app.infraestructure.database.models  # IMPORTANTE
-
-@asynccontextmanager
-async def lifespan(app: FastAPI):
-    Base.metadata.create_all(bind=engine)
-    yield
-
-app = FastAPI(lifespan=lifespan)
+password_hasher = BcryptPasswordHasher()
+token_service = JWTTokenService(secret_key=SECRET_KEY)
+notification_service = SmtpNotificationService(
+    host=SMTP_HOST,
+    port=SMTP_PORT,
+    username=SMTP_USERNAME,
+    password=SMTP_PASSWORD,
+    sender=SMTP_SENDER
+)
