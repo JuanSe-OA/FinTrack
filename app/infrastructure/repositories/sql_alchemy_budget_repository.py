@@ -1,4 +1,5 @@
 from datetime import datetime
+from uuid import UUID
 
 from app.domain.entities.budget import Budget
 from sqlalchemy.orm import Session
@@ -43,4 +44,19 @@ class SqlAlchemyBudgetRepository(BudgetRepository):
             limit_amount=model.limit_amount
             
         )
+    
+    def get_by_id(self, budget_id: UUID) -> Budget | None:
+        model = self.session.query(BudgetModel).filter_by(id=budget_id).first()
+        if not model:
+            return None
+        return Budget(
+            id=model.id,
+            user_id=model.user_id,
+            category_id=model.category_id,
+            month=model.month,
+            year=model.year,
+            limit_amount=model.limit_amount
+            
+        )
+
     

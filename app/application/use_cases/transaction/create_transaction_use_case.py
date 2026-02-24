@@ -5,6 +5,7 @@ from datetime import datetime, timezone
 from app.domain.entities.alert import Alert
 from app.application.unit_of_work import UnitOfWork
 from app.domain.entities.transaction import Transaction
+from app.domain.services.notification_service import NotificationService
 
 
 
@@ -18,8 +19,9 @@ class CreateTransactionCommand:
 
 class CreateTransactionUseCase:
 
-    def __init__(self, uow: UnitOfWork):
+    def __init__(self, uow: UnitOfWork, notification_service: NotificationService):
         self.uow = uow
+        self.notification_service = notification_service
 
     def execute(self, cmd: CreateTransactionCommand) -> UUID:
         with self.uow:
@@ -65,6 +67,12 @@ class CreateTransactionUseCase:
                     created_at=datetime.now(timezone.utc),
                 )
                 self.uow.alerts.add(alert)
+                self.notification_service.send_budget_exceeded(
+                    user_email=user.email,
+                    category_name=category.name,
+                    spent=total,
+                    limit=float(budget.limit_amount),
+                )
 
             self.uow.commit()
             return transaction.id

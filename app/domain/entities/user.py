@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 from datetime import datetime
-from sqlalchemy import UUID
+from uuid import UUID
 
 
 @dataclass
