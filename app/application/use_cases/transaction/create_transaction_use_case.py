@@ -33,7 +33,7 @@ class CreateTransactionUseCase:
                 raise PermissionError("User is not active")
 
             # 2. Validar que la categoría pertenece al usuario
-            category = self.uow.categories.get_by_id(cmd.category_id)
+            category = self.uow.categories.get_by_id(cmd.user_id,cmd.category_id)
             if category is None or category.user_id != cmd.user_id:
                 raise ValueError("Category not found")
 

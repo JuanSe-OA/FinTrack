@@ -114,3 +114,4 @@ def test_create_transaction_creates_alert_when_budget_exceeded():
 
     uow.alerts.add.assert_called_once()
     notification_service.send_budget_exceeded.assert_called_once()
+
