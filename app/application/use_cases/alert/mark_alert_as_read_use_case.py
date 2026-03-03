@@ -7,6 +7,7 @@ from app.application.unit_of_work import UnitOfWork
 @dataclass
 class MarkAlertAsReadCommand:
     alert_id: UUID
+    user_id: UUID
 
 
 class MarkAlertAsReadUseCase:
@@ -15,7 +16,7 @@ class MarkAlertAsReadUseCase:
 
     def execute(self, cmd: MarkAlertAsReadCommand) -> None:
         with self.uow:
-            alert = self.uow.alerts.get_by_id(cmd.alert_id)
+            alert = self.uow.alerts.get_by_id(cmd.user_id,cmd.alert_id)
             if alert is None:
                 raise ValueError("Alert not found")
 

@@ -23,3 +23,8 @@ class BudgetRepository(ABC):
     @abstractmethod
     def get_by_id(self, budget_id: UUID) -> None:
         pass
+
+
+    @abstractmethod
+    def update(self, budget: Budget) -> None:
+        pass

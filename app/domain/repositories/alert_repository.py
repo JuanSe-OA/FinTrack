@@ -13,3 +13,11 @@ class AlertRepository(ABC):
     @abstractmethod
     def list_by_user(self, user_id: UUID) -> list[Alert]:
         pass
+
+    @abstractmethod
+    def update(self, alert_id: UUID) -> None:
+        pass
+
+    @abstractmethod
+    def get_by_id(self,user_id: UUID, alert_id: UUID) -> Alert | None:
+        pass

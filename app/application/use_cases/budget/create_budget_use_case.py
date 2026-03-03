@@ -30,7 +30,7 @@ class CreateBudgetUseCase:
             if not user.is_active:
                 raise PermissionError("User is not active")
 
-            category = self.uow.categories.get_by_id(cmd.category_id)
+            category = self.uow.categories.get_by_id(cmd.user_id,cmd.category_id)
             if category is None or category.user_id != cmd.user_id:
                 raise ValueError("Category not found")
 
