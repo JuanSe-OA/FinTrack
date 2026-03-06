@@ -5,7 +5,7 @@ from datetime import datetime
 
 from app.application.use_cases.alert.get_user_alert_use_case import GetUserAlertsUseCase
 from app.application.use_cases.alert.mark_alert_as_read_use_case import MarkAlertAsReadCommand, MarkAlertAsReadUseCase
-from app.infrastructure.sql_alchemy_unit_of_work import SqlAlchemyUnitOfWork
+from app.infrastructure.repositories.dynamo_unit_of_work import DynamoUnitOfWork
 from app.presentation.dependencies import get_current_user_id
 
 
@@ -23,7 +23,7 @@ class AlertResponse(BaseModel):
 # Endpoints
 @router.get("/", response_model=list[AlertResponse])
 def get_user_alerts(user_id: UUID = Depends(get_current_user_id)):
-    uow = SqlAlchemyUnitOfWork()
+    uow = DynamoUnitOfWork()
     use_case = GetUserAlertsUseCase(uow)
     try:
         alerts = use_case.execute(user_id)
@@ -45,9 +45,9 @@ def mark_alert_as_read(
     alert_id: UUID,
     user_id: UUID = Depends(get_current_user_id)
 ):
-    uow = SqlAlchemyUnitOfWork()
+    uow = DynamoUnitOfWork()
     use_case = MarkAlertAsReadUseCase(uow)
     try:
-        use_case.execute(MarkAlertAsReadCommand(alert_id=alert_id))
+        use_case.execute(MarkAlertAsReadCommand(alert_id=alert_id,user_id=user_id))
     except ValueError as e:
         raise HTTPException(status_code=404, detail=str(e))

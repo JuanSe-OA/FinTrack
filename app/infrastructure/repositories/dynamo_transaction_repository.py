@@ -16,7 +16,7 @@ class DynamoTransactionRepository(TransactionRepository):
             "PK": f"USER#{transaction.user_id}",
             "SK": f"TRANSACTION#{transaction.id}",
             "id": str(transaction.id),
-            "amount": str(transaction.amount),  # Decimal se guarda como string en DynamoDB
+            "amount": str(transaction.amount),  
             "category_id": str(transaction.category_id),
             "description": transaction.description,
             "created_at": transaction.created_at.isoformat(),

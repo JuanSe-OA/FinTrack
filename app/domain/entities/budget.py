@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 from decimal import Decimal
-from sqlalchemy import UUID
+from uuid import UUID
 
 
 @dataclass

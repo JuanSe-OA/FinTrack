@@ -3,10 +3,10 @@ from fastapi.security import OAuth2PasswordRequestForm
 from pydantic import BaseModel, EmailStr
 from app.application.use_cases.user.register_user_use_case import RegisterUserUseCase, RegisterUserCommand
 from app.application.use_cases.user.authenticate_user_use_case import AuthenticateUserCommand, AuthenticateUserUseCase
+from app.infrastructure.repositories.dynamo_unit_of_work import DynamoUnitOfWork
 from app.infrastructure.security.bcrypt_password_hasher import BcryptPasswordHasher
 from app.infrastructure.security.jwt_token_service import JWTTokenService
 from app.infrastructure.config import SECRET_KEY
-from app.infrastructure.sql_alchemy_unit_of_work import SqlAlchemyUnitOfWork
 from fastapi import HTTPException
 
 router = APIRouter(prefix="/auth", tags=["auth"])
@@ -24,14 +24,14 @@ class RegisterRespone(BaseModel):
     id : str
 
 class TokenResponse(BaseModel):
-    acces_token : str
+    access_token : str
     token_type : str
 
 #Endpoints
 
 @router.post("/register", response_model=RegisterRespone, status_code=201)
 def register(body: RegisterRequest):
-    uow = SqlAlchemyUnitOfWork()
+    uow = DynamoUnitOfWork()
     use_case = RegisterUserUseCase(uow, password_hasher)
     try:
         user_id = use_case.execute(RegisterUserCommand(
@@ -44,13 +44,13 @@ def register(body: RegisterRequest):
     
 @router.post("/login", response_model=TokenResponse)
 def login(form: OAuth2PasswordRequestForm = Depends()):
-    uow = SqlAlchemyUnitOfWork()
+    uow = DynamoUnitOfWork()
     use_case = AuthenticateUserUseCase(uow, password_hasher, token_service)
     try:
         token = use_case.execute(AuthenticateUserCommand(
-            email=form.email,
+            email=form.username,
             password=form.password
         ))
-        return TokenResponse(acces_token=token, token_type="bearer")
+        return TokenResponse(access_token=token, token_type="bearer")
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))       

@@ -1,0 +1,4 @@
+pytest
+pytest-mock
+aws-cdk-lib
+constructs

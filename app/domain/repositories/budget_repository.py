@@ -21,7 +21,7 @@ class BudgetRepository(ABC):
         pass
     
     @abstractmethod
-    def get_by_id(self, budget_id: UUID) -> None:
+    def get_by_id(self, user_id: UUID, budget_id: UUID) -> Budget | None:
         pass
 
 

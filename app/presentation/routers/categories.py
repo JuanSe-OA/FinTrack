@@ -7,7 +7,7 @@ from app.application.use_cases.category.create_category_use_case import CreateCa
 from app.application.use_cases.category.delete_category_use_case import DeleteCategoryUseCase
 from app.application.use_cases.category.list_user_categories_use_case import ListUserCategoriesUseCase
 from app.domain.entities.category import CategoryType
-from app.infrastructure.sql_alchemy_unit_of_work import SqlAlchemyUnitOfWork
+from app.infrastructure.repositories.dynamo_unit_of_work import DynamoUnitOfWork
 from app.presentation.dependencies import get_current_user_id
 from fastapi import HTTPException
 
@@ -23,7 +23,7 @@ class CreateCategoryRequest(BaseModel):
 class CategoryResponse(BaseModel):
     id: str
     name: str
-    type: CategoryType
+    type: str
 
 #Endpoints
 
@@ -32,7 +32,7 @@ def create_category(
     body: CreateCategoryRequest,
     user_id: UUID = Depends(get_current_user_id)  
 ):
-    uow = SqlAlchemyUnitOfWork()
+    uow = DynamoUnitOfWork()
     use_case = CreateCategoryUseCase(uow)
     try:
         category_id = use_case.execute(CreateCategoryCommand(
@@ -47,7 +47,7 @@ def create_category(
     
 @router.get("/", response_model=list[CategoryResponse])
 def list_categories(user_id: UUID = Depends(get_current_user_id)):
-    uow = SqlAlchemyUnitOfWork()
+    uow = DynamoUnitOfWork()
     use_case = ListUserCategoriesUseCase(uow)
     categories = use_case.execute(user_id)
     return [{"id": str(c.id), "name": c.name, "type": c.type.value} for c in categories]
@@ -58,7 +58,7 @@ def delete_category(
     category_id: UUID,
     user_id: UUID = Depends(get_current_user_id)
 ):
-    uow = SqlAlchemyUnitOfWork()
+    uow = DynamoUnitOfWork()
     use_case = DeleteCategoryUseCase(uow)
     try:
         use_case.execute(category_id, user_id)

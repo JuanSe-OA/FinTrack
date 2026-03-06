@@ -6,8 +6,8 @@ from aws_cdk import (
     aws_sqs as sqs,
     aws_lambda_event_sources as lambda_events,
     aws_secretsmanager as secretsmanager,
-    aws_ses as ses,
     aws_logs as logs,
+    BundlingOptions,
 )
 from constructs import Construct
 
@@ -30,7 +30,7 @@ class FinTrackStack(cdk.Stack):
                 type=dynamodb.AttributeType.STRING
             ),
             billing_mode=dynamodb.BillingMode.PAY_PER_REQUEST,
-            removal_policy=cdk.RemovalPolicy.DESTROY,  # solo para dev
+            removal_policy=cdk.RemovalPolicy.DESTROY,
         )
 
         # ─── Secrets Manager ────────────────────────────────────
@@ -40,18 +40,34 @@ class FinTrackStack(cdk.Stack):
             description="FinTrack API secrets",
         )
 
-        # ─── SQS — cola de notificaciones ───────────────────────
+        # ─── SQS ────────────────────────────────────────────────
         email_queue = sqs.Queue(
             self, "EmailQueue",
             queue_name="fintrack-email-queue",
             visibility_timeout=cdk.Duration.seconds(30),
         )
-        log_group = logs.LogGroup(
+
+        # ─── Log Groups ─────────────────────────────────────────
+        api_log_group = logs.LogGroup(
             self, "FinTrackApiLogGroup",
             retention=logs.RetentionDays.ONE_WEEK,
             removal_policy=cdk.RemovalPolicy.DESTROY,
         )
 
+        email_log_group = logs.LogGroup(
+            self, "EmailWorkerLogGroup",
+            retention=logs.RetentionDays.ONE_WEEK,
+            removal_policy=cdk.RemovalPolicy.DESTROY,
+        )
+
+        # ─── Bundling ────────────────────────────────────────────
+        bundling = BundlingOptions(
+            image=lambda_.Runtime.PYTHON_3_12.bundling_image,
+            command=[
+                "bash", "-c",
+                "pip install -r requirements.txt -t /asset-output && cp -r app /asset-output/ && cp email_worker.py /asset-output/"
+            ]
+        )
 
         # ─── Lambda principal (FastAPI) ──────────────────────────
         api_lambda = lambda_.Function(
@@ -59,7 +75,7 @@ class FinTrackStack(cdk.Stack):
             function_name="fintrack-api",
             runtime=lambda_.Runtime.PYTHON_3_12,
             handler="app.main.handler",
-            code=lambda_.Code.from_asset("../app"),
+            code=lambda_.Code.from_asset("..", bundling=bundling),
             timeout=cdk.Duration.seconds(30),
             memory_size=256,
             environment={
@@ -67,8 +83,7 @@ class FinTrackStack(cdk.Stack):
                 "SECRET_NAME": secret.secret_name,
                 "EMAIL_QUEUE_URL": email_queue.queue_url,
             },
-            log_group=log_group,
-            
+            log_group=api_log_group,
         )
 
         # ─── Lambda worker (emails) ──────────────────────────────
@@ -77,12 +92,13 @@ class FinTrackStack(cdk.Stack):
             function_name="fintrack-email-worker",
             runtime=lambda_.Runtime.PYTHON_3_12,
             handler="email_worker.handler",
-            code=lambda_.Code.from_asset("../app"),
+            code=lambda_.Code.from_asset("..", bundling=bundling),
             timeout=cdk.Duration.seconds(30),
             environment={
                 "SECRET_NAME": secret.secret_name,
+                "SES_SENDER_EMAIL": "papcreativaexpress@gmail.com",
             },
-            log_group=log_group,
+            log_group=email_log_group,
         )
 
         # ─── Permisos ────────────────────────────────────────────
@@ -92,7 +108,14 @@ class FinTrackStack(cdk.Stack):
         email_queue.grant_send_messages(api_lambda)
         email_queue.grant_consume_messages(email_lambda)
 
-        # ─── SQS trigger para email worker ──────────────────────
+        # ─── SES permisos para email worker ─────────────────────
+        from aws_cdk import aws_iam as iam
+        email_lambda.add_to_role_policy(iam.PolicyStatement(
+            actions=["ses:SendEmail", "ses:SendRawEmail"],
+            resources=["*"]
+        ))
+
+        # ─── SQS trigger ────────────────────────────────────────
         email_lambda.add_event_source(
             lambda_events.SqsEventSource(email_queue, batch_size=1)
         )

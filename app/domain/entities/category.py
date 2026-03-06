@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 from enum import Enum
 
-from sqlalchemy import UUID
+from uuid import UUID
 
 class CategoryType(str, Enum):
     INCOME = "INCOME"
