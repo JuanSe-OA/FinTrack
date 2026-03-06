@@ -40,7 +40,7 @@ class DynamoCategoryRepository(CategoryRepository):
     
 
 
-    def list_by_user_id(self, user_id: UUID) -> list[Category]:
+    def get_all_by_user_id(self, user_id: UUID) -> list[Category]:
         response = self.table.query(
             KeyConditionExpression=Key("PK").eq(f"USER#{user_id}") & Key("SK").begins_with("CATEGORY#")
         )

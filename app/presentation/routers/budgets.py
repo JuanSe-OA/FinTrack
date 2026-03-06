@@ -7,11 +7,11 @@ from pydantic import BaseModel
 from app.application.use_cases.budget.create_budget_use_case import CreateBudgetUseCase
 from app.application.use_cases.budget.get_budget_status_use_case import GetBudgetStatusCommand, GetBudgetStatusUseCase
 from app.application.use_cases.budget.update_budget_use_case import UpdateBudgetCommand, UpdateBudgetUseCase
-from app.infrastructure.sql_alchemy_unit_of_work import SqlAlchemyUnitOfWork
+from app.infrastructure.repositories.dynamo_unit_of_work import DynamoUnitOfWork
 from app.presentation.dependencies import get_current_user_id
 
 
-router = APIRouter(prefix="/bugets", tags=["Budgets"])
+router = APIRouter(prefix="/budgets", tags=["Budgets"])
 
 # Schemas
 class CreateBudgetRequest(BaseModel):
@@ -43,10 +43,10 @@ def create_budget(
     body: CreateBudgetRequest,
     user_id: UUID = Depends(get_current_user_id)  
 ):
-    uow = SqlAlchemyUnitOfWork()
+    uow = DynamoUnitOfWork()
     use_case = CreateBudgetUseCase(uow)
     try:
-        budget_id = use_case.execute(CreateBudgetRequest(
+        budget_id = use_case.execute(CreateBudgetUseCase(
             user_id=user_id,
             category_id=body.category_id,
             month=body.month,
@@ -65,7 +65,7 @@ def get_budget_status(
     year: int,
     user_id: UUID = Depends(get_current_user_id)
 ):
-    uow = SqlAlchemyUnitOfWork()
+    uow = DynamoUnitOfWork()
     use_case = GetBudgetStatusUseCase(uow)
     try:
         status = use_case.execute(GetBudgetStatusCommand(
@@ -84,7 +84,7 @@ def update_budget(
     body: UpdateBudgetRequest,
     user_id: UUID = Depends(get_current_user_id)
 ):
-    uow = SqlAlchemyUnitOfWork()
+    uow = DynamoUnitOfWork()
     use_case = UpdateBudgetUseCase(uow)
     try:
         use_case.execute(UpdateBudgetCommand(

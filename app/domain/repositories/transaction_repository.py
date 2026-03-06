@@ -11,7 +11,7 @@ class TransactionRepository (ABC):
         pass
 
     @abstractmethod
-    def get_by_id(self, transaction_id) -> Transaction | None:
+    def get_by_id(self, user_id:UUID, transaction_id: UUID) -> Transaction | None:
         pass
 
     @abstractmethod
