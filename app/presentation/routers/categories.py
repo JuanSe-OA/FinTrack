@@ -18,6 +18,7 @@ router = APIRouter(prefix="/categories", tags=["Categories"])
 class CreateCategoryRequest(BaseModel):
     name : str
     type : CategoryType
+    description: str | None = None
 
 
 class CategoryResponse(BaseModel):
@@ -38,7 +39,8 @@ def create_category(
         category_id = use_case.execute(CreateCategoryCommand(
             user_id=user_id,
             name=body.name,
-            type=body.type
+            type=body.type,
+            description= body.description
         ))
         return CategoryResponse(id=str(category_id), name=body.name, type=body.type.value)
     except ValueError as e:

@@ -14,3 +14,4 @@ class Category:
     user_id: UUID
     name: str
     type: CategoryType
+    description: str | None = None

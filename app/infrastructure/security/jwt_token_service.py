@@ -1,9 +1,7 @@
 from datetime import datetime, timedelta, timezone
 from uuid import UUID
-import jwt
-
 from app.domain.services.token_service import TokenService
-
+import jwt
 
 class JWTTokenService(TokenService):
 
@@ -12,6 +10,8 @@ class JWTTokenService(TokenService):
         self.expiration_minutes = expiration_minutes
 
     def generate(self, user_id: UUID) -> str:
+        print(f"Generating token for user_id: {user_id}")
+        print(f"Secret key: {self.secret_key}")
         payload = {
             "sub": str(user_id),
             "exp": datetime.now(timezone.utc) + timedelta(minutes=self.expiration_minutes)

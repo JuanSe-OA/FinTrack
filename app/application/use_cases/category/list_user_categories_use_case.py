@@ -18,4 +18,4 @@ class ListUserCategoriesUseCase:
                 raise PermissionError("User is not active")
             
             
-            return self.uow.categories.get_by_user(user_id)
+            return self.uow.categories.get_all_by_user_id(user_id)

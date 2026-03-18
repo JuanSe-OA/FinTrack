@@ -5,6 +5,7 @@ from app.domain.services.password_hasher import PasswordHasher
 class BcryptPasswordHasher(PasswordHasher):
 
     def hash(self, plain_password: str) -> str:
+        print(f"tipo: {type(plain_password)}, valor: {plain_password}")
         salt = bcrypt.gensalt()
         return bcrypt.hashpw(plain_password.encode(), salt).decode()
 

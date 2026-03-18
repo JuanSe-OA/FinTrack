@@ -4,7 +4,7 @@ from uuid import UUID
 from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel
 
-from app.application.use_cases.budget.create_budget_use_case import CreateBudgetUseCase
+from app.application.use_cases.budget.create_budget_use_case import CreateBudgetCommand, CreateBudgetUseCase
 from app.application.use_cases.budget.get_budget_status_use_case import GetBudgetStatusCommand, GetBudgetStatusUseCase
 from app.application.use_cases.budget.update_budget_use_case import UpdateBudgetCommand, UpdateBudgetUseCase
 from app.infrastructure.repositories.dynamo_unit_of_work import DynamoUnitOfWork
@@ -46,7 +46,7 @@ def create_budget(
     uow = DynamoUnitOfWork()
     use_case = CreateBudgetUseCase(uow)
     try:
-        budget_id = use_case.execute(CreateBudgetUseCase(
+        budget_id = use_case.execute(CreateBudgetCommand(
             user_id=user_id,
             category_id=body.category_id,
             month=body.month,

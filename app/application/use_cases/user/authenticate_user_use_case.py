@@ -1,6 +1,7 @@
 from dataclasses import dataclass
 
 from app.application.unit_of_work import UnitOfWork
+from app.domain.services.notification_service import NotificationService
 from app.domain.services.password_hasher import PasswordHasher
 from app.domain.services.token_service import TokenService
 
@@ -11,10 +12,11 @@ class AuthenticateUserCommand:
     password: str
 
 class AuthenticateUserUseCase:
-    def __init__(self, uow: UnitOfWork, password_hasher: PasswordHasher, token_service: TokenService) :
+    def __init__(self, uow: UnitOfWork, password_hasher: PasswordHasher, token_service: TokenService, notification:NotificationService) :
         self.uow = uow
         self.password_hasher = password_hasher
         self.token_service = token_service
+        self.notification = notification
 
     def execute(self, cmd: AuthenticateUserCommand) -> str:
         with self.uow:
@@ -26,5 +28,6 @@ class AuthenticateUserUseCase:
             if not user.is_active:
                 raise PermissionError("User is not active")
 
+            self.notification.send_login_notification(user.email)
             return self.token_service.generate(user.id)
 

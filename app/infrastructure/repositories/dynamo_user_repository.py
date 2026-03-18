@@ -32,6 +32,7 @@ class DynamoUserRepository(UserRepository):
         return self._to_entity(item)
 
     def get_by_email(self, email: str) -> User | None:
+        print(f"Scanning for email: {email}")
         response = self.table.scan(
             FilterExpression=Attr("email").eq(email)
         )

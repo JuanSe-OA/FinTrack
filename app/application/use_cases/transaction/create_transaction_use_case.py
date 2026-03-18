@@ -55,7 +55,7 @@ class CreateTransactionUseCase:
             total = self.uow.transactions.get_total_expenses_for_month(
                 cmd.user_id, cmd.category_id, now.year, now.month
             )
-            budget = self.uow.budgets.get_by_user_category_month(
+            budget = self.uow.budgets.get_by_user_category_month_year(
                 cmd.user_id, cmd.category_id, now.year, now.month
             )
             if budget and total > float(budget.limit_amount):

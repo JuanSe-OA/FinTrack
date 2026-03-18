@@ -4,6 +4,7 @@ from uuid import UUID, uuid4
 
 from app.application.unit_of_work import UnitOfWork
 from app.domain.entities.user import User
+from app.domain.services.notification_service import NotificationService
 from app.domain.services.password_hasher import PasswordHasher
 
 
@@ -13,13 +14,14 @@ class RegisterUserCommand:
     password: str
 
 class RegisterUserUseCase:
-    def __init__(self, uow: UnitOfWork, password_hasher: PasswordHasher):
+    def __init__(self, uow: UnitOfWork, password_hasher: PasswordHasher, notification: NotificationService):
         self.uow = uow
         self.password_hasher = password_hasher
+        self.notification = notification
 
     def execute(self, command: RegisterUserCommand) -> UUID:
         with self.uow:
-            existing_user = self.uow.user_repo.find_by_email(command.email)
+            existing_user = self.uow.users.get_by_email(command.email)
             if existing_user:
                 raise ValueError("Email already registered")
 
@@ -31,6 +33,7 @@ class RegisterUserUseCase:
                 is_active=True,
                 created_at=datetime.now(timezone.utc),
             )
-            self.uow.transactions.add(user)
+            self.uow.users.add(user)
             self.uow.commit()
+            self.notification.send_welcome(user.email)
             return user.id
