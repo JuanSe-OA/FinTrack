@@ -23,3 +23,20 @@ class SqsNotificationService(NotificationService):
                 "limit": str(limit),
             })
         )
+    def send_welcome(self, user_email: str) -> None:
+        self.sqs.send_message(
+            QueueUrl=self.queue_url,
+            MessageBody=json.dumps({
+                "type": "welcome",
+                "user_email": user_email,
+            })
+        )
+
+    def send_login_notification(self, user_email: str) -> None:
+        self.sqs.send_message(
+            QueueUrl=self.queue_url,
+            MessageBody=json.dumps({
+                "type": "login",
+                "user_email": user_email,
+            })
+        )

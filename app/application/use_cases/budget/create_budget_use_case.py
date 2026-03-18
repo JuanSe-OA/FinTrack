@@ -34,7 +34,7 @@ class CreateBudgetUseCase:
             if category is None or category.user_id != cmd.user_id:
                 raise ValueError("Category not found")
 
-            existing = self.uow.budgets.get_by_user_category_month(
+            existing = self.uow.budgets.get_by_user_category_month_year(
                 cmd.user_id, cmd.category_id, cmd.month, cmd.year
             )
             if existing:

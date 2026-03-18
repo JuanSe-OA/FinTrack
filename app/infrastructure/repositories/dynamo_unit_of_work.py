@@ -12,10 +12,12 @@ from app.infrastructure.repositories.dynamo_alert_repository import DynamoAlertR
 class DynamoUnitOfWork(UnitOfWork):
 
     def __enter__(self):
+        print("Entrando al UnitOfWork")
         dynamodb = boto3.resource(
             "dynamodb",
             region_name=os.getenv("AWS_REGION", "us-east-1")
         )
+        print(f"DYNAMO_TABLE_NAME: {os.getenv('DYNAMO_TABLE_NAME')}")
         self.table = dynamodb.Table(os.getenv("DYNAMO_TABLE_NAME"))
 
         self.users = DynamoUserRepository(self.table)

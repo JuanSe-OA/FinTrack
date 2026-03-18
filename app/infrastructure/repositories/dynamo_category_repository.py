@@ -47,7 +47,7 @@ class DynamoCategoryRepository(CategoryRepository):
         return [self._to_entity(item) for item in response.get("Items", [])]
     
 
-    def get_all_by_user_and_type(self, user_id: UUID, type: CategoryType) -> list[Category]:
+    def get_all_by_user_id_and_type(self, user_id: UUID, type: CategoryType) -> list[Category]:
         response = self.table.query(
             KeyConditionExpression=Key("PK").eq(f"USER#{user_id}") & Key("SK").begins_with("CATEGORY#"),
             FilterExpression=Attr("type").eq(type.value)
