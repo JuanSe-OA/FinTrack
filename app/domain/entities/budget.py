@@ -1,5 +1,6 @@
 from dataclasses import dataclass
 from decimal import Decimal
+import time
 from uuid import UUID
 
 
@@ -15,3 +16,5 @@ class Budget:
     def __post_init__(self):
         if self.limit_amount <= 0:
             raise ValueError("Budget must be positive")
+        if self.year < time.localtime().tm_year:
+            raise ValueError("Budget can't be in the past")
