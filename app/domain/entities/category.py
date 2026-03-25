@@ -15,3 +15,7 @@ class Category:
     name: str
     type: CategoryType
     description: str | None = None
+
+    def __post_init__(self):
+        if not self.name or not self.name.strip():
+            raise ValueError ("Ctageory name is required")
